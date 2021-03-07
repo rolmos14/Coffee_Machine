@@ -1,98 +1,107 @@
+def buy_menu():
+
+    # Receipts
+    espresso = {"water": 250,
+                "milk": 0,
+                "coffee beans": 16,
+                "disposable cups": 1}
+
+    latte = {"water": 350,
+             "milk": 75,
+             "coffee beans": 20,
+             "disposable cups": 1}
+
+    cappuccino = {"water": 200,
+                  "milk": 100,
+                  "coffee beans": 12,
+                  "disposable cups": 1}
+
+    receipts = {"1": ("espresso", 4),
+                "2": ("latte", 7),
+                "3": ("cappuccino", 6)}
+
+    def enough_resources(receipt):
+        for resource in resources:
+            if resources[resource] >= receipt[resource]:
+                continue
+            else:
+                print(f"Sorry, not enough {resource}!")
+                return False
+        return True
+
+    def prepare(receipt):
+        global resources
+        for resource in resources:
+            # Take receipt quantities from existing resources
+            resources[resource] -= receipt[resource]
+
+    def add_cash(money):
+        global cash
+        cash += money
+
+    # Create receipts menu prompt dynamically based on existing receipts
+    receipts_menu = ""
+    for receipt_key, receipt_value in receipts.items():
+        receipts_menu += receipt_key + " - " + receipt_value[0] + ", "
+
+    item = input("\nWhat do you want to buy? " + receipts_menu + "back - to main menu: ")
+
+    if item != "back" and enough_resources(eval(receipts[item][0])):
+        print("I have enough resources, making you a coffee!")
+        # Prepare the receipt and add cash
+        prepare(eval(receipts[item][0]))
+        add_cash(receipts[item][1])
+
+
+def fill_menu():
+    global resources
+    resource_unit = {"water": "ml",
+                     "milk": "ml",
+                     "coffee beans": "grams",
+                     "disposable cups": ""}
+    print()
+    for resource in resources:
+        resources[resource] += \
+            int(input(f"Write how many {resource_unit[resource]} of {resource} do you want to add: "))
+
+
+def take_menu():
+    global cash
+    print(f"I gave you ${cash}")
+    cash = 0
+
+
 def print_state():
-    print(f"The coffee machine has:",
-          f"{avail_water} of water",
-          f"{avail_milk} of milk",
-          f"{avail_beans} of coffee beans",
-          f"{avail_cups} of disposable cups",
-          f"{avail_money} of money",
-          sep="\n")
+    print("\nThe coffee machine has:")
+    for resource, quantity in resources.items():
+        print(f"{quantity} of {resource}")
+    print(f"${cash} of money")
 
 
 def main_menu():
-    action = input("Write action (buy, fill, take): ")
+    action = input("Write action (buy, fill, take, remaining, exit): ")
     if action == "buy":
         buy_menu()
     elif action == "fill":
         fill_menu()
-    else:  # action == "take"
+    elif action == "take":
         take_menu()
-
-
-def buy_menu():
-    def prepare_espresso():
-        espresso_receipt = {"water": 250,
-                            "coffee beans": 16,
-                            "cups": 1,
-                            "cost": 4}
-        global avail_water, avail_beans, avail_cups, avail_money
-        avail_water -= espresso_receipt["water"]
-        avail_beans -= espresso_receipt["coffee beans"]
-        avail_cups -= espresso_receipt["cups"]
-        avail_money += espresso_receipt["cost"]
-
-    def prepare_latte():
-        latte_receipt = {"water": 350,
-                         "milk": 75,
-                         "coffee beans": 20,
-                         "cups": 1,
-                         "cost": 7}
-        global avail_water, avail_milk, avail_beans, avail_cups, avail_money
-        avail_water -= latte_receipt["water"]
-        avail_milk -= latte_receipt["milk"]
-        avail_beans -= latte_receipt["coffee beans"]
-        avail_cups -= latte_receipt["cups"]
-        avail_money += latte_receipt["cost"]
-
-    def prepare_cappuccino():
-        cappuccino_receipt = {"water": 200,
-                              "milk": 100,
-                              "coffee beans": 12,
-                              "cups": 1,
-                              "cost": 6}
-        global avail_water, avail_milk, avail_beans, avail_cups, avail_money
-        avail_water -= cappuccino_receipt["water"]
-        avail_milk -= cappuccino_receipt["milk"]
-        avail_beans -= cappuccino_receipt["coffee beans"]
-        avail_cups -= cappuccino_receipt["cups"]
-        avail_money += cappuccino_receipt["cost"]
-
-    item = input("What do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino: ")
-    if item == "1":
-        prepare_espresso()
-    elif item == "2":
-        prepare_latte()
-    else:  # item == "3"
-        prepare_cappuccino()
-
-
-def fill_menu():
-    global avail_water, avail_milk, avail_beans, avail_cups
-    avail_water += int(input("Write how many ml of water do you want to add: "))
-    avail_milk += int(input("Write how many ml of milk do you want to add: "))
-    avail_beans += int(input("Write how many grams of coffee beans do you want to add: "))
-    avail_cups += int(input("Write how many disposable cups of coffee do you want to add: "))
-
-
-def take_menu():
-    global avail_money
-    print(f"I gave you ${avail_money}")
-    avail_money = 0
+    elif action == "remaining":
+        print_state()
+    return action
 
 
 # Initial state
-avail_water = 400
-avail_milk = 540
-avail_beans = 120
-avail_cups = 9
-avail_money = 550
+resources = {"water": 400,
+             "milk": 540,
+             "coffee beans": 120,
+             "disposable cups": 9}
 
-# Print initial state
-print_state()
-print()  # empty line
+cash = 550
 
-# Call main menu and perform action
-main_menu()
-
-# Print final state
-print()  # empty line
-print_state()
+while True:
+    # Call main menu and perform action
+    action = main_menu()
+    if action == "exit":
+        break
+    print()  # empty line
